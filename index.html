@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Calculator</title>
+        <link rel="stylesheet" href="style.css">
+        <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+        <script src="javascript.js" defer></script>
+    </head>
+    <body>
+        <div id="main">
+            <div id="display">
+                <input type="text" id="user-entry" minlength="1" maxlength="10" value="">
+                <p id="numbers">0</p>
+            </div>   
+            <div id="top">
+                <button type="button" id="clear" value="clear">C</button>
+                <button type="button" id="delete" value="delete">Del</button>
+            </div>
+            <div class="container">
+                <!-- 1st row -->
+                <button type="button" class="digit" value="7"><p>7</p></button>
+                <button type="button" class="digit" value="8"><p>8</p></button>
+                <button type="button" class="digit" value="9"><p>9</p></button>
+                <button type="button" class="operator" data-operator="divide" value="/"><p>&divide;</p></button>
+                <!-- 2nd row -->
+                <button type="button" class="digit" value="4"><p>4</p></button>
+                <button type="button" class="digit" value="5"><p>5</p></button>
+                <button type="button" class="digit" value="6"><p>6</p></button>
+                <button type="button" class="operator" data-operator="multiply"  value="*"><p>&times;</p></button>
+                <!-- 3rd row -->
+                <button type="button" class="digit" value="1"><p>1</p></button>
+                <button type="button" class="digit" value="2"><p>2</p></button>
+                <button type="button" class="digit" value="3"><p>3</p></button>
+                <button type="button" class="operator" data-operator="subtract" value="-"><p>-</p></button>
+                <!-- 4th row -->
+                <button type="button" class="digit" value="0"><p>0</p></button>
+                <button type="button" value="decimal"><p>.</p></button>
+                <button type="button" id="equals" value="equals"><p>=</p></button>
+                <button type="button" class="operator" data-operator="add" value="+"><p>+</p></button>
+            </div>
+        </div>
+        <p id="footer">Created by Keiko S. March 2023</p>  
+    </body>
+</html>        
