@@ -1,5 +1,6 @@
 const numbers = document.getElementById("numbers");
 const equals = document.getElementById("equals");
+const clear = document.getElementById("clear");
 const userEntry = document.getElementById("user-entry");
 const container = document.querySelector(".container");
 let userEntryValue = userEntry.value; 
@@ -136,6 +137,19 @@ const enterEquals = function () {
 }
 // Attach the eventListener to equals button 
 equals.addEventListener("click", enterEquals);
+
+// Create an eventListener that clears the display on click 
+const enterClear = function () {
+    // Restore all the dynamically filled variables back to the initial state
+    userEntryValue = "";
+    numbers.textContent = "0";
+    userInputNumbers = []; 
+    operatorChosen = "";  
+    isEqualsPassed = false;
+    isOperatorSelected = false; 
+}
+// Attach the eventListener to clear button 
+clear.addEventListener("click", enterClear);
 
 // Avoid overflow by rounding answers with long decimals
 
