@@ -8,6 +8,7 @@ let userInputNumbers = [];
 let operatorChosen = "";  
 let isEqualsPassed = false;
 let isOperatorSelected = false; 
+let isFirstDigitInput = true;
 
 const add = function (initialValue, currentValue) {
     return initialValue + currentValue; 
@@ -34,19 +35,15 @@ const divide = function (initialValue, currentValue) {
 const operate = function (array, operator) {
     switch (operator) {
         case "add":
-            // return array.reduce(add); 
             numbers.textContent = array.reduce(add);
             break; 
         case "subtract": 
-            // return array.reduce(subtract); 
             numbers.textContent = array.reduce(subtract);
             break; 
         case "multiply":
-            // return array.reduce(multiply); 
             numbers.textContent = array.reduce(multiply);
             break; 
         case "divide":
-            // return array.reduce(divide); 
             numbers.textContent = array.reduce(divide);
             break; 
         default: 
@@ -57,19 +54,23 @@ const operate = function (array, operator) {
     // Pass the solution to userEntry.value
         userEntryValue = numbers.textContent;
         console.log("operator's solution passed to userEntryValue: " + userEntryValue);
-        // empty userInputNumbers and push the solution
+        // put the solution to the userInputNumbers[0]
         userInputNumbers = [];
         userInputNumbers.push(userEntryValue);
+        userEntryValue = "";
 } 
 
 // Create an eventLister that displays numbers as user enters them upto 10 digits 
 const displayNumEntry = function (e) {
     // IF any digit button is clicked and it is an first input, add to userEntry.value
-    if (e.target.closest(".digit") && !isEqualsPassed && 
-    userEntryValue.length <= 10) {
+    if (e.target.closest(".digit") && !isEqualsPassed && userEntryValue.length <= 10) {
             userEntryValue += e.target.textContent;
             numbers.textContent = userEntryValue; 
             console.log("this is displayNumEntry function: isEqualsPassed-" +  isEqualsPassed)
+            // Turn isOperatorSelected to false only on the first digit entry
+            if (isOperatorSelected) {
+                isOperatorSelected = false;
+              }
     } 
 }
 // Attach the eventListener to all the number buttons (attached to the parent node)
@@ -77,15 +78,15 @@ container.addEventListener("click", displayNumEntry);
 
 // Create a function that store the user's number input in the userInputNumbers
 const storeNumbers = function () {
-// Change the value stored in userEntryValue from string to decimal numbers 
+    // Change the value stored in userEntryValue from string to decimal numbers 
     const strToNum = parseFloat(userEntryValue);
-// IF userInputNumbers has less than 2 values stored
+    // IF userInputNumbers has less than 2 values stored
     if (userInputNumbers.length < 2) {
-// Push it to fill in array[0]
+    // Push it to fill in array[0]
         userInputNumbers.push(strToNum);
-// ELSE maintain the values stored in the array up to 2 values 
+    // ELSE maintain the values stored in the array up to 2 values 
     } else {
-// remove the value in array[0] and push the new value 
+    // Remove the value in array[0] and push the new value 
         userInputNumbers.shift();
         userInputNumbers.push(strToNum);
     } 
@@ -108,29 +109,39 @@ const displayNumbers = function () {
 // Create an eventListener that stores the user's selected operator in operatorChosen, store numbers, and display numbers
 const selectOperator = function (e) { 
     const operatorButton = e.target.closest('button[data-operator]');
-    if (operatorButton && !isOperatorSelected){
+    if (operatorButton){
+    // Edge Case: Operator button is hit multiple times
+        if (isOperatorSelected){
+            operatorChosen = operatorButton.dataset.operator; 
+            console.log("operator pressed multiple times: " + operatorChosen)
+        } 
+    // IF this is the first click of an operator button after initial numbers are entered
+        if (!isOperatorSelected && userInputNumbers.length <= 1){
         // Store the selected operator in operatorChosen
-        operatorChosen = operatorButton.dataset.operator;
-        // IF the user pressed the operator multiple times, prevent from updating the value on textContent and userEntryValue from updating
-        isOperatorSelected = true;
-        storeNumbers();
-        displayNumbers();
-        console.log("This is selectOperator IF case: " + operatorChosen + "isOperatorSelected-" + isOperatorSelected);    
-       // ELSE when the user pressed operator multiple times AND the new digits are not entered yet, update operatorChosen
-    } else if (operatorButton) {
-        operatorChosen = operatorButton.dataset.operator;
-        console.log("This is selectOperator test ELSE case: userInputNumbers-" + userInputNumbers);
-    }
-}
+            operatorChosen = operatorButton.dataset.operator;
+        // Prevent from updating the value on textContent and userEntryValue from updating after one click
+            isOperatorSelected = true;
+            storeNumbers();
+            displayNumbers();
+            console.log("This is selectOperator !isOperatorSelected case: " + operatorChosen + " isOperatorSelected- " + isOperatorSelected);    
+            if (userInputNumbers.length === 2){
+                operate(userInputNumbers, operatorChosen); 
+            }
+        } 
+    } 
+}  
 // Attach the eventListener to operator buttons to respond on click 
 container.addEventListener("click", selectOperator);
 
 // Create an eventListener to run operate function 
 const enterEquals = function () {
+    // Edge Case: IF isEqualsPassed is true, return
+    if (isEqualsPassed) return; 
+    // Otherwise, update userTextContent and userEntryValue 
     storeNumbers();
     displayNumbers();
-    // IF "=" has already been clicked and solution is finalized, keep the final solution in the textContent
-    if (userInputNumbers.length === 2 && !isEqualsPassed){
+    // IF userInputNumbers is filled with two values, run operate function
+    if (userInputNumbers.length === 2 && !isEqualsPassed){   
         operate(userInputNumbers, operatorChosen); 
         isEqualsPassed = true; 
     } 
