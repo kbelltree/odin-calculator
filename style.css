@@ -36,23 +36,6 @@ body {
     align-items: end;
 }
 
-/* input {
-    width: 100%;
-    border: none;
-    border-radius: 5px; 
-    background-color: transparent;
-} */
-input {
-    display: none;
-    padding: 0;
-    border: none;
-}
-/* input[type="text"] {
-    font-size: 3.5em;
-    color: #edededd9;
-    text-align: right;
-} */
-
 #numbers {
     margin: 0;
     padding-right: 0.25em;
