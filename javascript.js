@@ -59,10 +59,13 @@ const operate = function (array, operator) {
     }
 // IF returned solution (numbers.textContent) is more than 10 digits, round up
 }    
-
 // Create an eventLister for "digit" buttons that calls event.target and displays numbers as user enters them upto 10 digits 
 const displayNumEntry = function(target) {
     console.log("displayNumEntry called");
+        // Edge: IF digit entry is made right after equals passed, refresh to start a new calculation 
+        if (isDigitEntry && isEqualsPassed && isOperatorSelected && userInputNumbers.length === 1){
+            enterClear();
+        }
         // Overwrite with new entry and reset isOperatorSelected to push new operator entry, also change isEqualPassed true to false to continue calculation
         if (numbers.textContent === "0" || isOperatorSelected || isEqualsPassed){
             numbers.textContent = target.textContent;
@@ -87,12 +90,17 @@ const storeOperand = function() {
 
 // Create an eventListener for "equals" button that stores operand2, run operate, and display result
 const enterEquals = function() {
-    // Edge: equals button is pressed more than one time, refresh for new calculation
-    if (isEqualsPassed) {
-        enterClear();
-    }
-    // Check if the equals button is not pressed before and there's an operator and an operand
+    // Edge: equals button is pressed without a new digit entry after the last calculation, clear the display
+    // if (isEqualsPassed && !isDigitEntry) {
+    //     enterClear();
+    //     return;
+    // }
+    // IF operand1 is filled and operand2 is ready, start calculation upon equals click
     if (!isEqualsPassed && userInputNumbers.length === 1 && isDigitEntry){
+        // Edge: operator button is clicked after equals passed, ignore the following actions to avoid bug calculation
+        if (isOperatorSelected){
+            return;
+        } 
         storeOperand();
         numbers.textContent = operate(userInputNumbers, operatorChosen);
         userInputNumbers =[];
