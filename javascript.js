@@ -2,6 +2,7 @@ const numbers = document.getElementById("numbers");
 const equals = document.getElementById("equals");
 const clear = document.getElementById("clear");
 const decimal = document.getElementById("decimal");
+const backspace = document.getElementById("delete");
 // const userEntry = document.getElementById("user-entry");
 const container = document.querySelector(".container");
 // let userEntryValue = userEntry.value; 
@@ -171,7 +172,7 @@ container.addEventListener("click", handleDigitOperatorClick);
 equals.addEventListener("click", enterEquals);
 
 // Create an eventListener that clears the display on click 
-const enterClear = function () {
+const enterClear = function() {
     // Restore all the dynamically filled variables back to the initial state
     // userEntryValue = "";
     numbers.textContent = "0";
@@ -188,7 +189,7 @@ clear.addEventListener("click", enterClear);
 
 // BONUS
 // Create an eventListener that adds floating point for decimals
-const addDecimalPoint = function (){
+const addDecimalPoint = function() {
     if(!numbers.textContent.includes(".")) {
         numbers.textContent += ".";
     }
@@ -196,9 +197,16 @@ const addDecimalPoint = function (){
 // Attach the eventListener to decimal button
 decimal.addEventListener("click", addDecimalPoint);
 
-// The decimal need to be disabled once it is entered to avoid extra points entries
-// Add a backspace button to undo entries
-
+// Create an eventListener that undo entries
+const deleteEntry = function() {
+    if (numbers.textContent.length > 0) {
+        numbers.textContent = numbers.textContent.slice(0, -1);
+    } else {
+        numbers.textContent = "error";
+    }
+}
+// Attach the eventListener to del button
+backspace.addEventListener("click", deleteEntry);
 
 // PERSONALLY Added
 // Add "ON" button and add eventListener that activate all the eventListeners to accommodate "equals" function that removes all the eventListeners
