@@ -1,6 +1,7 @@
 const numbers = document.getElementById("numbers");
 const equals = document.getElementById("equals");
 const clear = document.getElementById("clear");
+const decimal = document.getElementById("decimal");
 // const userEntry = document.getElementById("user-entry");
 const container = document.querySelector(".container");
 // let userEntryValue = userEntry.value; 
@@ -35,38 +36,47 @@ const divide = function (initialValue, currentValue) {
     }
 }
 
-// Create an eventListener that takes two numbers and one operator run an appropriate function 
+// Avoid overflow by rounding answers with long decimals 
+// Remove redundant zero display after decimals
+const trimDecimals = function (number) {
+    let trimmedToTenDigits = number.toPrecision(10);
+    return parseFloat(trimmedToTenDigits);
+}
+
+// Create an eventListener that takes two numbers and one operator, then run an appropriate function 
 const operate = function (array, operator) {
+    let result = 0; 
     switch (operator) {
         case "add":
             // numbers.textContent = array.reduce(add);
-            return array.reduce(add);
+            result = array.reduce(add);
             break; 
         case "subtract": 
             // numbers.textContent = array.reduce(subtract);
-            return array.reduce(subtract);
+            result = array.reduce(subtract);
             break; 
         case "multiply":
             // numbers.textContent = array.reduce(multiply);
-            return array.reduce(multiply);
+            result = array.reduce(multiply);
             break; 
         case "divide":
             // numbers.textContent = array.reduce(divide);
-            return array.reduce(divide);
+            result = array.reduce(divide);
             break; 
         default: 
             return;
     }
-// IF returned solution (numbers.textContent) is more than 10 digits, round up
+    return trimDecimals(result);
 }    
-// Create an eventLister for "digit" buttons that calls event.target and displays numbers as user enters them upto 10 digits 
+
+// Create an eventLister for "digit" buttons that calls event.target and displays numbers as user enters them 
 const displayNumEntry = function(target) {
     console.log("displayNumEntry called");
         // Edge: IF digit entry is made right after equals passed, refresh to start a new calculation 
         if (isDigitEntry && isEqualsPassed && isOperatorSelected && userInputNumbers.length === 1){
             enterClear();
         }
-        // Overwrite with new entry and reset isOperatorSelected to push new operator entry, also change isEqualPassed true to false to continue calculation
+        // Overwrite with new entry and reset isOperatorSelected to push new operator entry, also switch isEqualPassed from true to false to continue calculation
         if (numbers.textContent === "0" || isOperatorSelected || isEqualsPassed){
             numbers.textContent = target.textContent;
             isOperatorSelected = false;
@@ -74,8 +84,9 @@ const displayNumEntry = function(target) {
             isDigitEntry = true; 
         // Continue to enter digit if equals is not clicked 
         } else { 
-        numbers.textContent += target.textContent; 
+            numbers.textContent += target.textContent; 
         }
+        
 }
 
 // Create a function that changes the textContent entry to number type and store it 
@@ -97,7 +108,7 @@ const enterEquals = function() {
     // }
     // IF operand1 is filled and operand2 is ready, start calculation upon equals click
     if (!isEqualsPassed && userInputNumbers.length === 1 && isDigitEntry){
-        // Edge: operator button is clicked after equals passed, ignore the following actions to avoid bug calculation
+        // Edge: IF operator button is clicked after equals passed, ignore the following actions to avoid bug calculation
         if (isOperatorSelected){
             return;
         } 
@@ -146,7 +157,7 @@ const handleDigitOperatorClick = function (e) {
     const digitButton = e.target.closest(".digit");
     const operatorButton = e.target.closest('button[data-operator]');
     // IF digit button is clicked
-    if (digitButton && numbers.textContent.length <= 10) {
+    if (digitButton) {
         displayNumEntry(digitButton);
     }
     // IF operator button is clicked
@@ -172,20 +183,22 @@ const enterClear = function () {
 // Attach the eventListener to clear button 
 clear.addEventListener("click", enterClear);
 
-// Avoid overflow by rounding answers with long decimals
 
-// Equal Gotchas
-// Clear operatorChosen and userInputNumbers to stop recycling previous result and operator that results in buggy calculation
-// const resetOpOpd = function () {
-//     operatorChosen = "";
-//     userInputNumbers = [];
-//     isOperatorSelected = false; 
-// }
+
 
 // BONUS
-// Add floating point for decimals
+// Create an eventListener that adds floating point for decimals
+const addDecimalPoint = function (){
+    if(!numbers.textContent.includes(".")) {
+        numbers.textContent += ".";
+    }
+}
+// Attach the eventListener to decimal button
+decimal.addEventListener("click", addDecimalPoint);
+
 // The decimal need to be disabled once it is entered to avoid extra points entries
 // Add a backspace button to undo entries
+
 
 // PERSONALLY Added
 // Add "ON" button and add eventListener that activate all the eventListeners to accommodate "equals" function that removes all the eventListeners
@@ -194,5 +207,6 @@ clear.addEventListener("click", enterClear);
 
 // Create an eventLister that checks if the entry is only numeric or operator and equals when keydown event fired 
 
+// Adjust size of digits in display as the digits increase
 
 
