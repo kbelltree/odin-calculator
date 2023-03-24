@@ -35,8 +35,8 @@ const divide = function (initialValue, currentValue) {
     }
 }
 
-// Avoid overflow by rounding answers with long decimals 
-// Remove redundant zero display after decimals
+/* Avoid overflow by rounding answers with long decimals 
+   Remove redundant zero display after decimals */
 const trimDecimals = function (number) {
     let trimmedToTenDigits = number.toPrecision(10);
     return parseFloat(trimmedToTenDigits);
@@ -62,29 +62,32 @@ const operate = function (array, operator) {
             return;
     }
     // IF result contains error message, return the message
-    if (typeof result !== "number"){
-        return result; 
-    } else {
-    return trimDecimals(result);
-    }
+    return typeof result !== "number" ? result : trimDecimals(result);
 }
 
-// Create an eventLister for "digit" buttons that calls event.target and displays numbers as user enters them 
-const displayNumEntry = function (target) {
+/* Create an eventLister for "digit" buttons that calls event.target and displays numbers as user enters them 
+   As an additional feature, make this function also work with digit keydown event */
+const displayNumEntry = function (target, isFromKeydown = false) {
     console.log("displayNumEntry called");
+    
+    // IF digit entry is from key, use value from key, otherwise from textContent (ChatGPT4)
+    const valueEntered = isFromKeydown ? target.key : target.textContent;
+    
     // Edge: IF digit entry is made right after equals passed, refresh to start a new calculation 
     if (isDigitEntry && isEqualsPassed && isOperatorSelected && userInputNumbers.length === 1) {
         enterClear();
     }
-    // Overwrite with new entry and reset isOperatorSelected to push new operator entry, also switch isEqualPassed from true to false to continue calculation
+
+    /* Overwrite with new entry and reset isOperatorSelected to push new operator entry
+       Also switch isEqualPassed from true to false to continue calculation */
     if (numbers.textContent === "0" || isOperatorSelected || isEqualsPassed) {
-        numbers.textContent = target.textContent;
+        numbers.textContent = valueEntered;
         isOperatorSelected = false;
-        // isEqualsPassed = false; // Reset the flag when a number button is clicked
         isDigitEntry = true;
+
         // Continue to enter digit if equals is not clicked 
     } else {
-        numbers.textContent += target.textContent;
+        numbers.textContent += valueEntered;
     }
 }
 
@@ -98,11 +101,13 @@ const storeOperand = function () {
     }
 }
 
-// Create an eventListener for "equals" button that stores operand2, run operate, and display result
+/* Create an eventListener for "equals" button that stores operand2, run operate, and display result
+   As an additional feature, make this function also work with digit keydown event */
 const enterEquals = function () {
     // IF operand1 is filled and operand2 is ready, start calculation upon equals click
     if (!isEqualsPassed && userInputNumbers.length === 1 && isDigitEntry) {
-        // Edge: IF operator button is clicked after equals passed, ignore the following actions to avoid bug calculation
+        
+        // Edge: IF operator button is clicked after equals passed, skip rest of the actions 
         if (isOperatorSelected) {
             return;
         }
@@ -116,21 +121,32 @@ const enterEquals = function () {
         return;
     }
 }
-// Create an eventListener for "operate" buttons that calls event.target 
-// stores operator choice
-const prepareCalculation = function (target) {
-    console.log("selectOperator called");
+
+// Attach eventListener to equal button 
+equals.addEventListener("click", enterEquals);
+
+/* Create an eventListener for "operate" buttons that calls event.target and stores operator choice
+   Additional feature: make this function also work with operator keydown event */
+const prepareCalculation = function (target, isFromKeydown = false) {
+    console.log("prepareCalculation called");
+    
+    // IF the digit entry is from key, use value from key, otherwise from textContent (ChatGPT4)
+    const operatorEntered = isFromKeydown ? stringifyOperator(target.key) : target.dataset.operator; 
+
     // Edge: only update operatorChosen when operator button is clicked more than once 
     if (isOperatorSelected) {
-        operatorChosen = target.dataset.operator;
-        isEqualsPassed = false; // Edge: Continue calculation after "equals" is passed 
+        operatorChosen = operatorEntered;
+       
+        // Edge: Continue calculation after "equals" is passed 
+        isEqualsPassed = false; 
+       
         // IF this is the first operator button click update operatorChosen &  userInputNumbers 
     } else {
         isOperatorSelected = true;
         isDigitEntry = false;
         switch (userInputNumbers.length) {
             case 0:
-                operatorChosen = target.dataset.operator;
+                operatorChosen = operatorEntered;
                 storeOperand();
                 break;
             case 1:
@@ -138,7 +154,7 @@ const prepareCalculation = function (target) {
                 numbers.textContent = operate(userInputNumbers, operatorChosen);
                 userInputNumbers = [];
                 storeOperand();
-                operatorChosen = target.dataset.operator;
+                operatorChosen = operatorEntered;
                 break;
             default:
                 return;
@@ -146,61 +162,126 @@ const prepareCalculation = function (target) {
     }
 }
 
-// Chat GPT 4 advises using delegation on eventHandler that handle digit buttons and operator buttons all in one
+// Use delegation on eventHandler that handle digit buttons and operator buttons all in one (ChatGPT4)
 const handleDigitOperatorClick = function (e) {
     const digitButton = e.target.closest(".digit");
     const operatorButton = e.target.closest('button[data-operator]');
+    
     // IF digit button is clicked
     if (digitButton) {
         displayNumEntry(digitButton);
     }
+    
     // IF operator button is clicked
     if (operatorButton) {
         prepareCalculation(operatorButton);
     }
 }
+
 // Attach eventListener to all the digit buttons & operator buttons (attached to the parent node)
 container.addEventListener("click", handleDigitOperatorClick);
-// Attach eventListener to equal button 
-equals.addEventListener("click", enterEquals);
 
 // Create an eventListener that clears the display on click 
 const enterClear = function () {
     // Restore all the dynamically filled variables back to the initial state
-    // userEntryValue = "";
     numbers.textContent = "0";
     userInputNumbers = [];
     operatorChosen = "";
     isEqualsPassed = false;
     isOperatorSelected = false;
-}
+    isDigitEntry = false; 
+}     
+
 // Attach the eventListener to clear button 
 clear.addEventListener("click", enterClear);
 
-// BONUS
-// Create an eventListener that adds floating point for decimals
+/* EXTRA CREDIT Features
+   Create an eventListener that adds floating point for decimals (ChatGPT4) */ 
 const addDecimalPoint = function () {
     if (!numbers.textContent.includes(".")) {
         numbers.textContent += ".";
     }
 }
+
 // Attach the eventListener to decimal button
 decimal.addEventListener("click", addDecimalPoint);
 
-// Create an eventListener that undo entries
+// Create an eventListener that undoes entries (ChatGPT4)
 const deleteEntry = function () {
     if (numbers.textContent.length > 0) {
-        numbers.textContent = numbers.textContent.slice(0, -1);
+        numbers.textContent = numbers.textContent.slice(0, -1); // Remove from right to left
     } else {
         numbers.textContent = "error";
     }
 }
+
 // Attach the eventListener to del button
 backspace.addEventListener("click", deleteEntry);
 
-// PERSONALLY Added
+/* PERSONALLY Added
+   Create an eventListener that checks if the entry is digit on keydown */
+const handleDigitKeydown = function (e) {
+    if (e.key >= 0 && e.key <= 9){
+        displayNumEntry(e, true);
+    }
+}
 
-// Create an eventLister that checks if the entry is only numeric or operator and equals when keydown event fired 
+// Attach the eventListener to digit keys
+document.addEventListener("keydown", handleDigitKeydown);
+
+// Create an eventListener that checks if the entry is operator on keydown (ChatGPT4)
+const handleOperatorKeydown = function (e) {
+    const operatorKeys = ["+", "-", "*", "/"];
+    if (operatorKeys.includes(e.key)){
+        prepareCalculation(e, true);
+    }
+}
+
+// Stringify the arithmetic operator value passed from e.key (ChatGPT4)
+function stringifyOperator(symbol) {
+    const operatorMap = {
+        "/": "divide",
+        "*": "multiply",
+        "-": "subtract",
+        "+": "add",
+    };
+    return operatorMap[symbol] || null;
+}
+
+// Attach the eventListener to operator keys
+document.addEventListener("keydown", handleOperatorKeydown);
+
+// Create an eventListener that checks if the entry is equals on keydown (ChatGPT4)
+const handleEqualsKeydown = function (e) {
+    if (e.key === "="){
+        enterEquals();
+    }
+}
+
+// Attach the eventListener to equals key
+document.addEventListener("keydown", handleEqualsKeydown);
+
+// Create an eventListener that checks if the entry is decimal on keydown (ChatGPT4)
+const handleDecimalKeydown = function (e) {
+    if (e.key === ".") {
+        addDecimalPoint();
+    }
+}
+
+// Attach the eventListener to decimal key
+document.addEventListener("keydown", handleDecimalKeydown);
+
+// Create an eventListener that checks if the entry is delete on keydown (ChatGPT4)
+const handleDeleteKeydown = function (e) {
+    console.log("delete key pressed")
+    if (e.key === "Backspace") {
+        deleteEntry(); 
+    }
+}
+
+// Attach the eventListener to delete key
+document.addEventListener("keydown", handleDeleteKeydown);
+
 
 // Adjust size of digits in display as the digits increase
 
