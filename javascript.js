@@ -36,10 +36,17 @@ const divide = function (initialValue, currentValue) {
 }
 
 /* Avoid overflow by rounding answers with long decimals 
-   Remove redundant zero display after decimals */
+   Remove redundant zero display in the bottom of decimal place */
 const trimDecimals = function (number) {
     let trimmedToTenDigits = number.toPrecision(10);
-    return parseFloat(trimmedToTenDigits);
+    let trimmedDecimalPlace = parseFloat(trimmedToTenDigits);
+
+    // IF the entire digits are more than 11 digits, use exponential symbols
+    if (trimmedDecimalPlace.toString().length > 11) {
+        return trimmedDecimalPlace.toExponential(5);
+    } else {
+        return trimmedDecimalPlace;
+    }
 }
 
 // Create an eventListener that takes two numbers and one operator, then run an appropriate function 
@@ -67,7 +74,6 @@ const operate = function (array, operator) {
 
 /* Create an eventLister for "digit" buttons that calls event.target and displays numbers as user enters them. Extra Credit: Make this function also work with digit keydown event */
 const displayNumEntry = function (target, isFromKeydown = false) {
-    console.log("displayNumEntry called");
 
     // IF digit entry is from key, use value from key, otherwise from textContent 
     const valueEntered = isFromKeydown ? target.key : target.textContent;
@@ -77,15 +83,14 @@ const displayNumEntry = function (target, isFromKeydown = false) {
         enterClear();
     }
 
-    /* Overwrite with new entry and reset isOperatorSelected to push new operator entry.
-       Also switch isEqualPassed from true to false to continue calculation */
+    /* Overwrite with new entry and reset isOperatorSelected to push new operator entry. Also switch isEqualPassed from true to false to continue calculation */
     if (numbers.textContent === "0" || isOperatorSelected || isEqualsPassed) {
         numbers.textContent = valueEntered;
         isOperatorSelected = false;
         isDigitEntry = true;
 
-        // Continue to enter digit if equals is not clicked 
-    } else {
+        // Continue to enter digit if equals is not clicked up to length of 11
+    } else if (numbers.textContent.length < 11) {
         numbers.textContent += valueEntered;
     }
 }
@@ -125,7 +130,6 @@ equals.addEventListener("click", enterEquals);
 
 /* Create an eventListener for "operate" buttons that calls event.target and stores operator choice. Extra Credit: Make this function also work with operator keydown event */
 const prepareCalculation = function (target, isFromKeydown = false) {
-    console.log("prepareCalculation called");
 
     // IF the digit entry is from key, use value from key, otherwise from textContent 
     const operatorEntered = isFromKeydown ? stringifyOperator(target.key) : target.dataset.operator;
@@ -193,7 +197,7 @@ const enterClear = function () {
 clear.addEventListener("click", enterClear);
 
 // EXTRA CREDIT Features
-   
+
 // Create an eventListener that adds floating point for decimals
 const addDecimalPoint = function () {
     if (!numbers.textContent.includes(".")) {
@@ -234,7 +238,7 @@ const handleOperatorKeydown = function (e) {
     }
 }
 
-// Stringify the arithmetic operator value passed from e.key
+// Declare a function for logical flow to stringify the arithmetic operator value passed from e.key 
 function stringifyOperator(symbol) {
     const operatorMap = {
         "/": "divide",
@@ -270,7 +274,6 @@ document.addEventListener("keydown", handleDecimalKeydown);
 
 // Create an eventListener that checks if the entry is delete on keydown
 const handleDeleteKeydown = function (e) {
-    console.log("delete key pressed")
     if (e.key === "Backspace") {
         deleteEntry();
     }
