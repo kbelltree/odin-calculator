@@ -1,8 +1,8 @@
 # odin-calculator
 ## Project: Calculator / The Odin Project
 <br>
-<div style="text-align: center;">
-<img src="assets/calculator-the-odin-project-keiko-s-2023.png" alt="calculator-project-by-keiko-s-2023" style="max-width: 50%;">
+<div align="center">
+   <img src="assets/calculator-the-odin-project-keiko-s-2023.png" alt="calculator-project-by-keiko-s-2023" width=50% height=50%>
 </div>
 <br>
 
