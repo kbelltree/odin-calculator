@@ -38,12 +38,10 @@ const divide = function (initialValue, currentValue) {
 /* Avoid overflow by rounding answers with long decimals 
    Remove redundant zero display in the bottom of decimal place */
 const trimDecimals = function (number) {
-    let trimmedToTenDigits = number.toPrecision(10);
-    let trimmedDecimalPlace = parseFloat(trimmedToTenDigits);
-
+    let trimmedDecimalPlace = parseFloat(number);
     // IF the entire digits are more than 11 digits, use exponential symbols
     if (trimmedDecimalPlace.toString().length > 11) {
-        return trimmedDecimalPlace.toExponential(5);
+        return trimmedDecimalPlace.toExponential(6);
     } else {
         return trimmedDecimalPlace;
     }
